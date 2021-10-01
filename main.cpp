@@ -118,6 +118,7 @@ int main()
                     FinishPosition.x = tilePosition.x;
                     FinishPosition.y = tilePosition.y;
 
+
                     i_FinishPosition = tilePosition.x + (tilePosition.y * max_col);
 
                     level[i_FinishPosition] = 2;   // place three in the tile
