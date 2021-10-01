@@ -8,28 +8,18 @@
 #include <cstdlib>
 #include <cstdio>
 
-#define MAX_ROWS 21
-#define MAX_COLUMNS 44
-
-char MazeExample[MAX_ROWS][MAX_COLUMNS] = {"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
-                                           "x                                        x",
-                                           "x     x                                  x",
-                                           "x   xxx                                  x",
-                                           "x     x                                  x",
-                                           "x                                        x",
-                                           "x                                        x",
-                                           "x                                        x",
-                                           "x                                        x",
-                                           "x                                        x",
-                                           "x                                        x",
-                                           "x                                        x",
-                                           "x                                        x",
-                                           "x                                        x",
-                                           "x                                        x",
-                                           "x          x                             x",
-                                           "x         x                              x",
-                                           "x         xxx                            x",
-                                           "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"};
+char MazeExample[MAX_ROWS][MAX_COLUMNS] = {"xxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+                                           "x                           x",
+                                           "x     x                     x",
+                                           "x   xxx                     x",
+                                           "x                           x",
+                                           "x                           x",
+                                           "x                           x",
+                                           "x                           x",
+                                           "x      x                    x",
+                                           "x     x                     x",
+                                           "x     xxx                   x",
+                                           "xxxxxxxxxxxxxxxxxxxxxxxxxxxxx"};
 
 char** allocateMemoryForMaze()
 {
@@ -52,6 +42,14 @@ int** allocateMemoryForMazeDistance()
         //printf("Allocated");
     }
 
+    for (int y = 0; y < MAX_ROWS; ++y)
+    {
+        for (int x = 0; x < MAX_COLUMNS; ++x)
+        {
+            maze[y][x] = 0;
+        }
+    }
+
     return maze;
 }
 
@@ -61,7 +59,7 @@ bool** allocateMemoryForMazeVisited()
     for(int i = 0; i < MAX_ROWS; ++i)
     {
         maze[i] = new bool[MAX_COLUMNS];
-        printf("Allocated");
+        //printf("Allocated");
     }
 
     for (int y = 0; y < MAX_ROWS; ++y)
@@ -88,10 +86,10 @@ void addMaze(char** memory)
 
 void deleteMemoryForMaze(char **p)
 {
-    for(int i = 0; i < MAX_COLUMNS; ++i){
+    for(int i = 0; i < MAX_COLUMNS; ++i)
+    {
         delete[] p[i];  //deletes an inner array of integer;
     }
-
     delete[] p;
 }
 

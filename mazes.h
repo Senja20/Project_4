@@ -5,8 +5,8 @@
 #ifndef PROJECT_4_MAZES_H
 #define PROJECT_4_MAZES_H
 
-#define MAX_ROWS 21
-#define MAX_COLUMNS 44
+#define MAX_ROWS 12
+#define MAX_COLUMNS 30
 
 char** allocateMemoryForMaze();
 int** allocateMemoryForMazeDistance();
