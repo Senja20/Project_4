@@ -5,30 +5,24 @@
 #include "Queue.h"
 #include "List.h"
 #include "mazes.h"
-#include <malloc.h>
 #include <fstream>
 
 #define tileSize 32
 #define byteSize 8
 
-int FromTwoDToOneD (int x, int y);
-sf::Vector2i FromOneDToTwoD (int i);
+int FromTwoDToOneD (int x, int y, int );
+sf::Vector2i FromOneDToTwoD (int i, int);
 
 int main()
 {
-    Queue queue = CreateQueue(100);
+
     List<sf::Vector2i>* stack = new List<sf::Vector2i>;
-
-    char **maze = allocateMemoryForMaze();
-    int **distance = allocateMemoryForMazeDistance();
-    bool **visited = allocateMemoryForMazeVisited();
-
-    std::ifstream infile("Maze.txt");
-    int x, y;
 
     std::vector<sf::Vector2i> barrierList;
     sf::Vector2i maxSize;
 
+    std::ifstream infile("Maze.txt");
+    int x, y;
     while (infile >> x >> y)
     {
         barrierList.emplace_back(sf::Vector2i(x,y));
@@ -36,7 +30,13 @@ int main()
 
     maxSize = barrierList[0];
 
-    addMaze(maze);
+    Queue queue = CreateQueue(maxSize.x * 2 + maxSize.y * 2);
+
+    char **maze = allocateMemoryForMaze(maxSize.y, maxSize.x);
+    int **distance = allocateMemoryForMazeDistance(maxSize.y, maxSize.x);
+    bool **visited = allocateMemoryForMazeVisited(maxSize.y, maxSize.x);
+
+    addMaze(maze, barrierList);
 
     bool isStartSet = false;
     bool isFinishSet = false;
@@ -53,13 +53,13 @@ int main()
 
     int positionOneDimension;
 
-    int level[MAX_ROWS * maxSize.y];  // 1D list of tiles
+    int level[maxSize.x * maxSize.y];  // 1D list of tiles
 
-    for (int y = 0; y < MAX_ROWS; ++y)
+    for (int y = 0; y < maxSize.x; ++y)
     {
         for (int x = 0; x < maxSize.y; ++x)
         {
-            positionOneDimension = FromTwoDToOneD(x, y); // calculate position of 2D array in 1D
+            positionOneDimension = FromTwoDToOneD(x, y, maxSize.y); // calculate position of 2D array in 1D
 
             if (maze[y][x] == 32)   // if empty
             {
@@ -69,7 +69,7 @@ int main()
             {
                 level[positionOneDimension] = 3;   // place stone
             }
-            else if (maze[y][x] == 109 || maze[y][x] == 99) // chess or mouse
+            else if (maze[y][x] == 109 || maze[y][x] == 99) // c and m
             {
                 level[positionOneDimension] = 2;    // place threes
             }
@@ -104,7 +104,15 @@ int main()
                 tilePosition.x = MousePosition.x/tileSize;
                 tilePosition.y = MousePosition.y/tileSize;
 
-                if (!isStartSet)
+                if (maze[tilePosition.y][tilePosition.x] == 120)
+                {
+                    printf("Position (%i, %i) is not allowed", tilePosition.x, tilePosition.y);
+                }
+                else if(tilePosition.x > maxSize.x || tilePosition.x < 0 || tilePosition.y > maxSize.y || tilePosition.y < 0)
+                {
+                    printf("position is outside of the scope!");
+                }
+                else if (!isStartSet)
                 {
                     isStartSet = true;
 
@@ -114,15 +122,13 @@ int main()
                     i_StartPosition = tilePosition.x + (tilePosition.y * maxSize.y);
                     level[i_StartPosition] = 2;   // place three in the tile
 
-                    int x = i_StartPosition % maxSize.y;
-
-                    int y = i_StartPosition / maxSize.y;
+                    x = i_StartPosition % maxSize.y;
+                    y = i_StartPosition / maxSize.y;
 
                     std::cout << "x:" << x << "y: " << y << std::endl;
 
                     maze[StartPosition.y][StartPosition.x] = 109;
                 }
-
                 else if (!isFinishSet)
                 {
                     isFinishSet = true;
@@ -157,14 +163,14 @@ int main()
                 position = FrontOfQueue(queue);
                 Dequeue(queue);
 
-                popValue = FromOneDToTwoD(position);
+                popValue = FromOneDToTwoD(position, maxSize.y);
 
                 if(popValue == FinishPosition)
                 {
                     ReachedFinish = true;
                     printf("found!");
 
-                    for (int y = 0; y < MAX_ROWS; ++y)
+                    for (int y = 0; y < maxSize.x; ++y)
                     {
                         printf("\n");
                         for (int x = 0; x < maxSize.y; ++x)
@@ -188,7 +194,7 @@ int main()
                     {
                         visited[southNeighbour.y][southNeighbour.x] = true;
                         distance[southNeighbour.y][southNeighbour.x] = distance[popValue.y][popValue.x] + 1;
-                        int north = FromTwoDToOneD(southNeighbour.x, southNeighbour.y);
+                        int north = FromTwoDToOneD(southNeighbour.x, southNeighbour.y, maxSize.y);
                         Enqueue(north, queue);
                     }
 
@@ -200,7 +206,7 @@ int main()
                     {
                         visited[northNeighbour.y][northNeighbour.x] = true;
                         distance[northNeighbour.y][northNeighbour.x] = distance[popValue.y][popValue.x] + 1;
-                        int south = FromTwoDToOneD(northNeighbour.x, northNeighbour.y);
+                        int south = FromTwoDToOneD(northNeighbour.x, northNeighbour.y, maxSize.y);
                         Enqueue(south, queue);
                     }
 
@@ -212,7 +218,7 @@ int main()
                     {
                         visited[eastNeighbour.y][eastNeighbour.x] = true;
                         distance[eastNeighbour.y][eastNeighbour.x] = distance[popValue.y][popValue.x] + 1;
-                        int east = FromTwoDToOneD(eastNeighbour.x, eastNeighbour.y);
+                        int east = FromTwoDToOneD(eastNeighbour.x, eastNeighbour.y, maxSize.y);
                         Enqueue(east, queue);
                     }
 
@@ -224,7 +230,7 @@ int main()
                     {
                         visited[westNeighbour.y][westNeighbour.x] = true;
                         distance[westNeighbour.y][westNeighbour.x] = distance[popValue.y][popValue.x] + 1;
-                        int west = FromTwoDToOneD(westNeighbour.x, westNeighbour.y);
+                        int west = FromTwoDToOneD(westNeighbour.x, westNeighbour.y, maxSize.y);
                         Enqueue(west, queue);
                     }
                 }
@@ -234,19 +240,35 @@ int main()
             {
                 std::cout << "No path exists from (" << StartPosition.x << ", "<< StartPosition.y << ") to (" << FinishPosition.x << ", "<< StartPosition.y << ")" << std::endl;
             }
-
             else
             {
-
-
                 while (queue->size != 0)
                 {
                     Dequeue(queue);
                 }
 
                 stack->Push(&FinishPosition);
+
                 sf::Vector2i* nextPosition = stack->GetLast();
                 sf::Vector2i* test;
+
+                maze[FinishPosition.y][FinishPosition.x] = 120;
+
+                maze[StartPosition.y + 1][StartPosition.x] = 120;
+                maze[StartPosition.y - 1][StartPosition.x] = 120;
+                maze[StartPosition.y][StartPosition.x + 1] = 120;
+                maze[StartPosition.y][StartPosition.x - 1] = 120;
+
+                maze[StartPosition.y + 1][StartPosition.x + 1] = 120;
+                maze[StartPosition.y - 1][StartPosition.x - 1] = 120;
+
+                maze[FinishPosition.y + 1][FinishPosition.x] = 120;
+                maze[FinishPosition.y - 1][FinishPosition.x] = 120;
+                maze[FinishPosition.y][FinishPosition.x + 1] = 120;
+                maze[FinishPosition.y][FinishPosition.x - 1] = 120;
+
+                maze[FinishPosition.y + 1][FinishPosition.x + 1] = 120;
+                maze[FinishPosition.y - 1][FinishPosition.x - 1] = 120;
 
                 while(true)
                 {
@@ -267,11 +289,6 @@ int main()
                     westNeighbour.y = nextPosition->y;
                     westNeighbour.x = nextPosition->x - 1;
 
-                    if(westNeighbour == *nextPosition)
-                    {
-                        nextPosition->x++;
-                    }
-
                     if (visited[southNeighbour.y][southNeighbour.x]
                     && distance[southNeighbour.y][southNeighbour.x] == distance[nextPosition->y][nextPosition->x] - 1)
                     {
@@ -279,7 +296,7 @@ int main()
                         *nextPosition = southNeighbour;
                         test = stack->GetLast();
                         printf("%i, %i", test->x, test->y);
-                        level[FromTwoDToOneD(test->x, test->y)] = 2;
+                        level[FromTwoDToOneD(test->x, test->y, maxSize.y)] = 2;
                         maze[test->y][test->x] = 120;
 
                         maze[test ->y + 1][test->x] = 120;
@@ -297,7 +314,7 @@ int main()
                         *nextPosition = northNeighbour;
                         test = stack->GetLast();
                         printf("%i, %i", test->x, test->y);
-                        level[FromTwoDToOneD(test->x, test->y)] = 2;
+                        level[FromTwoDToOneD(test->x, test->y, maxSize.y)] = 2;
                         maze[test->y][test->x] = 120;
 
                         maze[test ->y + 1][test->x] = 120;
@@ -314,7 +331,7 @@ int main()
                         *nextPosition = eastNeighbour;
                         test = stack->GetLast();
                         printf("%i, %i", test->x, test->y);
-                        level[FromTwoDToOneD(test->x, test->y)] = 2;
+                        level[FromTwoDToOneD(test->x, test->y, maxSize.y)] = 2;
                         maze[test->y][test->x] = 120;
 
                         maze[test ->y + 1][test->x] = 120;
@@ -330,7 +347,7 @@ int main()
                         *nextPosition = westNeighbour;
                         test = stack->GetLast();
                         printf("\n\n%i, %i\n\n", test->x, test->y);
-                        level[FromTwoDToOneD(test->x, test->y)] = 2;
+                        level[FromTwoDToOneD(test->x, test->y, maxSize.y)] = 2;
                         maze[test->y][test->x] = 120;
 
                         maze[test ->y + 1][test->x] = 120;
@@ -354,22 +371,16 @@ int main()
                 maze[StartPosition.y][StartPosition.x] = 120;
                 maze[FinishPosition.y][FinishPosition.x] = 120;
 
-                maze[StartPosition.y + 1][StartPosition.x] = 120;
-                maze[StartPosition.y - 1][StartPosition.x] = 120;
-                maze[StartPosition.y][StartPosition.x + 1] = 120;
-                maze[StartPosition.y][StartPosition.x - 1] = 120;
-
-
                 // reset
                 isFinishSet = false;
                 isStartSet = false;
 
-                distance = allocateMemoryForMazeDistance();
-                visited = allocateMemoryForMazeVisited();
+                distance = allocateMemoryForMazeDistance(maxSize.y, maxSize.x);
+                visited = allocateMemoryForMazeVisited(maxSize.y, maxSize.x);
             }
         }
 
-        if (!map.load("tiles.png", sf::Vector2u(32, 32), level, maxSize.y, MAX_ROWS))
+        if (!map.load("tiles.png", sf::Vector2u(32, 32), level, maxSize.y, maxSize.x))
             return -1;
 
         window.clear();
@@ -389,18 +400,18 @@ int main()
     return 0;
 }
 
-int FromTwoDToOneD (int x, int y)
+int FromTwoDToOneD (int x, int y, int maxrow)
 {
-    int i = x + ( y * MAX_COLUMNS);
+    int i = x + ( y * maxrow);
     return i;
 }
 
-sf::Vector2i FromOneDToTwoD (int i)
+sf::Vector2i FromOneDToTwoD (int i, int maxrow)
 {
     sf::Vector2i temp;
 
-    temp.x = i % MAX_COLUMNS;
-    temp.y = i / MAX_COLUMNS;
+    temp.x = i % maxrow;
+    temp.y = i / maxrow;
 
     return temp;
 }

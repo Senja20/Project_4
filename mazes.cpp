@@ -1,50 +1,56 @@
 //
-// Created by yauhe on 25/09/2021.
+// Created by yauhen and marija on 25/09/2021.
 //
-
 #include "mazes.h"
-
-
 #include <cstdlib>
 #include <cstdio>
+#include <vector>
+#include <SFML/System/Vector2.hpp>
 
-char MazeExample[MAX_ROWS][MAX_COLUMNS] = {"xxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
-                                           "x                           x",
-                                           "x     x                     x",
-                                           "x   xxx                     x",
-                                           "x                           x",
-                                           "x                           x",
-                                           "x                           x",
-                                           "x                           x",
-                                           "x      x                    x",
-                                           "x     x                     x",
-                                           "x     xxx                   x",
-                                           "xxxxxxxxxxxxxxxxxxxxxxxxxxxxx"};
-
-char** allocateMemoryForMaze()
+char** allocateMemoryForMaze(int maxCol, int maxRow)
 {
-    char** a = new char*[MAX_ROWS];
-    for(int i = 0; i < MAX_ROWS; ++i)
+    char** a = new char*[maxRow];
+    for(int i = 0; i < maxRow; ++i)
     {
-        a[i] = new char[MAX_COLUMNS];
-        printf("Allocated");
+        a[i] = new char[maxCol];
+        //printf("Allocated");
+    }
+
+    for (int y = 0; y < maxRow; ++y)
+    {
+        for (int x = 0; x < maxCol; ++x)
+        {
+            a[y][x] = 32;
+        }
+    }
+
+    for (int y = 0; y < maxRow; ++y)
+    {
+        a[y][0] = 120;
+        a[y][maxCol - 1] = 120;
+    }
+
+    for (int x = 0; x < maxCol; ++x)
+    {
+        a[0][x] = 120;
+        a[maxRow - 1][x] = 120;
     }
 
     return a;
 }
 
-int** allocateMemoryForMazeDistance()
+int** allocateMemoryForMazeDistance(int maxCol, int maxRow)
 {
-    int** maze = new int*[MAX_ROWS];
-    for(int i = 0; i < MAX_ROWS; ++i)
+    int** maze = new int*[maxRow];
+    for(int i = 0; i < maxRow; ++i)
     {
-        maze[i] = new int[MAX_COLUMNS];
+        maze[i] = new int[maxCol];
         //printf("Allocated");
     }
 
-    for (int y = 0; y < MAX_ROWS; ++y)
+    for (int y = 0; y < maxRow; ++y)
     {
-        for (int x = 0; x < MAX_COLUMNS; ++x)
+        for (int x = 0; x < maxCol; ++x)
         {
             maze[y][x] = 0;
         }
@@ -53,18 +59,18 @@ int** allocateMemoryForMazeDistance()
     return maze;
 }
 
-bool** allocateMemoryForMazeVisited()
+bool** allocateMemoryForMazeVisited(int maxCol, int maxRow)
 {
-    bool ** maze = new bool*[MAX_ROWS];
-    for(int i = 0; i < MAX_ROWS; ++i)
+    bool ** maze = new bool*[maxRow];
+    for(int i = 0; i < maxRow; ++i)
     {
-        maze[i] = new bool[MAX_COLUMNS];
+        maze[i] = new bool[maxCol];
         //printf("Allocated");
     }
 
-    for (int y = 0; y < MAX_ROWS; ++y)
+    for (int y = 0; y < maxRow; ++y)
     {
-        for (int x = 0; x < MAX_COLUMNS; ++x)
+        for (int x = 0; x < maxCol; ++x)
         {
             maze[y][x] = false;
         }
@@ -73,14 +79,14 @@ bool** allocateMemoryForMazeVisited()
     return maze;
 }
 
-void addMaze(char** memory)
+void addMaze(char** memory, std::vector<sf::Vector2i> barrier)
 {
-    for (int y = 0; y < MAX_ROWS; ++y)
+    sf::Vector2i barrierTile;
+
+    for (int i = 1; i < barrier.size(); ++i)
     {
-        for (int x = 0; x < MAX_COLUMNS; ++x)
-        {
-            memory[y][x] = MazeExample[y][x];
-        }
+        barrierTile = barrier[i];
+        memory[barrierTile.y][barrierTile.x] = 120;
     }
 }
 
