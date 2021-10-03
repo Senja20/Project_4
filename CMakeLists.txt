@@ -3,7 +3,7 @@ project(Project_4)
 
 set(CMAKE_CXX_STANDARD 14)
 
-add_executable(Project_4 main.cpp Queue.cpp Queue.h TileMap.cpp TileMap.h mazes.cpp mazes.h)
+add_executable(Project_4 main.cpp Queue.cpp Queue.h TileMap.cpp TileMap.h mazes.cpp mazes.h StaticStack.cpp StaticStack.h)
 
 include_directories(c:/SFML/include)
 

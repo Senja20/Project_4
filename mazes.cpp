@@ -90,27 +90,29 @@ void addMaze(char** memory, std::vector<sf::Vector2i> barrier)
     }
 }
 
-void deleteMemoryForMaze(char **p)
+void deleteMemoryForMaze(char **p, int maxCol)
 {
-    for(int i = 0; i < MAX_COLUMNS; ++i)
+    for(int i = 0; i < maxCol; ++i)
     {
         delete[] p[i];  //deletes an inner array of integer;
     }
     delete[] p;
 }
 
-void deleteMemoryForDistance(int **p)
+void deleteMemoryForDistance(int **p, int maxCol)
 {
-    for(int i = 0; i < MAX_COLUMNS; ++i){
+    for(int i = 0; i < maxCol; ++i)
+    {
         delete[] p[i];  //deletes an inner array of integer;
     }
 
     delete[] p;
 }
 
-void deleteMemoryForVisited(bool **p)
+void deleteMemoryForVisited(bool **p, int maxCol)
 {
-    for(int i = 0; i < MAX_COLUMNS; ++i){
+    for(int i = 0; i < maxCol; ++i)
+    {
         delete[] p[i];  //deletes an inner array of integer;
     }
 
