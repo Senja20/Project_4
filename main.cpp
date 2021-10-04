@@ -18,9 +18,7 @@ sf::Vector2i FromOneDToTwoD (int , int);
 
 int main()
 {
-    // create the window
-    sf::RenderWindow window(sf::VideoMode(modeWidth , modeHeight), "Tilman");
-    sf::View view;
+
     TileMap map;
     List<sf::Vector2i>* stack = new List<sf::Vector2i>;
     std::vector<sf::Vector2i> barrierList;
@@ -35,6 +33,9 @@ int main()
 
     Queue queue = CreateQueue(maxSize.x * 2 + maxSize.y * 2);
 
+// create the window
+    sf::RenderWindow window(sf::VideoMode(maxSize.y*tileSize + 2 , maxSize.x*tileSize + 2), "Project 4");
+    sf::View view;
     char **maze = allocateMemoryForMaze(maxSize.y, maxSize.x);
     int **distance = allocateMemoryForMazeDistance(maxSize.y, maxSize.x);
     bool **visited = allocateMemoryForMazeVisited(maxSize.y, maxSize.x);
