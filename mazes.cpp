@@ -45,7 +45,6 @@ int** allocateMemoryForMazeDistance(int maxCol, int maxRow)
     for(int i = 0; i < maxRow; ++i)
     {
         maze[i] = new int[maxCol];
-        //printf("Allocated");
     }
 
     for (int y = 0; y < maxRow; ++y)

@@ -8,11 +8,8 @@
 #include "mazes.h"
 #include <fstream>
 #include "StaticStack.h"
-
 #define tileSize 32
 #define byteSize 8
-#define modeWidth 800
-#define modeHeight 800
 
 int FromTwoDToOneD (int x, int y, int );
 sf::Vector2i FromOneDToTwoD (int , int);
@@ -36,7 +33,7 @@ int main()
 
     // create the window
     sf::RenderWindow window(sf::VideoMode(maxSize.y*tileSize + 2 , maxSize.x*tileSize + 2), "Project 4");
-    sf::View view;
+    sf::View view; // change tiles
     char **maze = allocateMemoryForMaze(maxSize.y, maxSize.x);
     int **distance = allocateMemoryForMazeDistance(maxSize.y, maxSize.x);
     bool **visited = allocateMemoryForMazeVisited(maxSize.y, maxSize.x);
@@ -243,10 +240,10 @@ int main()
                 std::cout << "No path exists from (" << StartPosition.x << ", "<< StartPosition.y << ") to (" << FinishPosition.x << ", "<< StartPosition.y << ")" << std::endl;
                 DisplayQueue(queue);
 
-                while (queue->size != 0)
-                {
-                    Dequeue(queue);
-                }
+                level[i_StartPosition] = 0;
+                level[i_FinishPosition] = 0;
+
+                while (queue->size != 0) Dequeue(queue);
 
                 // reset
                 isFinishSet = false;
@@ -277,29 +274,40 @@ int main()
                 maze[FinishPosition.y + 1][FinishPosition.x - 1] = 120;
                 maze[FinishPosition.y - 1][FinishPosition.x + 1] = 120;
 
-            }else{ // slightly confused, but somehow works
+            }else{
+                // slightly confused, but somehow works
                 while (queue->size != 0)Dequeue(queue);
+                int water;
+
                 stack->Push(&FinishPosition);
                 sf::Vector2i* nextPosition = stack->GetLast();
                 sf::Vector2i* test;
+
                 maze[FinishPosition.y][FinishPosition.x] = 120;
+
                 maze[StartPosition.y + 1][StartPosition.x] = 120;
                 maze[StartPosition.y - 1][StartPosition.x] = 120;
                 maze[StartPosition.y][StartPosition.x + 1] = 120;
                 maze[StartPosition.y][StartPosition.x - 1] = 120;
+
                 maze[StartPosition.y + 1][StartPosition.x + 1] = 120;
                 maze[StartPosition.y - 1][StartPosition.x - 1] = 120;
                 maze[StartPosition.y + 1][StartPosition.x - 1] = 120;
                 maze[StartPosition.y - 1][StartPosition.x + 1] = 120;
+
                 maze[FinishPosition.y + 1][FinishPosition.x] = 120;
                 maze[FinishPosition.y - 1][FinishPosition.x] = 120;
                 maze[FinishPosition.y][FinishPosition.x + 1] = 120;
                 maze[FinishPosition.y][FinishPosition.x - 1] = 120;
+
                 maze[FinishPosition.y + 1][FinishPosition.x + 1] = 120;
                 maze[FinishPosition.y - 1][FinishPosition.x - 1] = 120;
                 maze[FinishPosition.y + 1][FinishPosition.x - 1] = 120;
                 maze[FinishPosition.y - 1][FinishPosition.x + 1] = 120;
-                while(true){if (*nextPosition == StartPosition)break;   // don't worry about this. I am an engineer
+
+                while(true){
+                    if (*nextPosition == StartPosition)break;   // don't worry about this. I am an engineer
+
                     southNeighbour.y = nextPosition->y + 1;             // be happy
                     southNeighbour.x = nextPosition->x;
                     northNeighbour.y = nextPosition->y - 1;
@@ -308,9 +316,11 @@ int main()
                     eastNeighbour.x = nextPosition->x + 1;
                     westNeighbour.y = nextPosition->y;
                     westNeighbour.x = nextPosition->x - 1;
+
                     if (visited[southNeighbour.y][southNeighbour.x]
                     && distance[southNeighbour.y][southNeighbour.x] == distance[nextPosition->y][nextPosition->x] - 1)
-                    {stack->Push(&southNeighbour);
+                    {
+                        stack->Push(&southNeighbour);
                         int south = FromTwoDToOneD((int)southNeighbour.x, (int)southNeighbour.y, maxSize.y);
                         PushStack(south, staticStack);
                         *nextPosition = southNeighbour;
@@ -318,14 +328,26 @@ int main()
                         printf("%i, %i", test->x, test->y);
                         level[FromTwoDToOneD(test->x, test->y, maxSize.y)] = 2;
                         maze[test->y][test->x] = 120;
+
                         maze[test ->y + 1][test->x] = 120;
                         maze[test->y - 1][test->x] = 120;
                         maze[test ->y][test->x + 1] = 120;
                         maze[test->y][test->x - 1] = 120;
+
                         maze[test->y + 1][test->x + 1] = 120;
                         maze[test->y - 1][test->x - 1] = 120;
                         maze[test->y - 1][test->x + 1] = 120;
-                        maze[test->y - 1][test->x + 1] = 120;
+                        maze[test->y + 1][test->x - 1] = 120;
+
+                        /*water = FromTwoDToOneD(test->x + 1, test->y + 1, maxSize.y);
+                        level[water] = 1;
+                        water = FromTwoDToOneD(test->x - 1, test->y - 1, maxSize.y);
+                        level[water] = 1;
+                        water = FromTwoDToOneD(test->x + 1, test->y - 1, maxSize.y);
+                        level[water] = 1;
+                        water = FromTwoDToOneD(test->x - 1, test->y + 1, maxSize.y);
+                        level[water] = 1;*/
+
                     }else if (visited[northNeighbour.y][northNeighbour.x]
                     && distance[northNeighbour.y][northNeighbour.x] == distance[nextPosition->y][nextPosition->x] - 1)
                     {stack->Push(&northNeighbour);
@@ -340,13 +362,26 @@ int main()
                         maze[test->y - 1][test->x] = 120;
                         maze[test ->y][test->x + 1] = 120;
                         maze[test->y][test->x - 1] = 120;
+
                         maze[test->y + 1][test->x + 1] = 120;
                         maze[test->y - 1][test->x - 1] = 120;
                         maze[test->y - 1][test->x + 1] = 120;
-                        maze[test->y - 1][test->x + 1] = 120;}
+                        maze[test->y + 1][test->x - 1] = 120;
+
+                        /*water = FromTwoDToOneD(test->x + 1, test->y + 1, maxSize.y);
+                        level[water] = 1;
+                        water = FromTwoDToOneD(test->x - 1, test->y - 1, maxSize.y);
+                        level[water] = 1;
+                        water = FromTwoDToOneD(test->x + 1, test->y - 1, maxSize.y);
+                        level[water] = 1;
+                        water = FromTwoDToOneD(test->x - 1, test->y + 1, maxSize.y);
+                        level[water] = 1;*/
+
+                    }
                     else if (visited[eastNeighbour.y][eastNeighbour.x]
                     && distance[eastNeighbour.y][eastNeighbour.x] == distance[nextPosition->y][nextPosition->x] - 1)
-                    {int east = FromTwoDToOneD((int)eastNeighbour.x, (int)eastNeighbour.y, maxSize.y);
+                    {
+                        int east = FromTwoDToOneD((int)eastNeighbour.x, (int)eastNeighbour.y, maxSize.y);
                         PushStack(east, staticStack);
                         stack->Push(&eastNeighbour);
                         *nextPosition = eastNeighbour;
@@ -354,14 +389,27 @@ int main()
                         printf("%i, %i", test->x, test->y);
                         level[FromTwoDToOneD(test->x, test->y, maxSize.y)] = 2;
                         maze[test->y][test->x] = 120;
+
                         maze[test ->y + 1][test->x] = 120;
                         maze[test->y - 1][test->x] = 120;
                         maze[test ->y][test->x + 1] = 120;
                         maze[test->y][test->x - 1] = 120;
+
                         maze[test->y + 1][test->x + 1] = 120;
                         maze[test->y - 1][test->x - 1] = 120;
                         maze[test->y - 1][test->x + 1] = 120;
-                        maze[test->y - 1][test->x + 1] = 120;}
+                        maze[test->y + 1][test->x + 1] = 120;
+
+                        /*water = FromTwoDToOneD(test->x + 1, test->y + 1, maxSize.y);
+                        level[water] = 1;
+                        water = FromTwoDToOneD(test->x - 1, test->y - 1, maxSize.y);
+                        level[water] = 1;
+                        water = FromTwoDToOneD(test->x + 1, test->y - 1, maxSize.y);
+                        level[water] = 1;
+                        water = FromTwoDToOneD(test->x - 1, test->y + 1, maxSize.y);
+                        level[water] = 1;*/
+
+                    }
                     else if (visited[westNeighbour.y][westNeighbour.x]
                     && distance[westNeighbour.y][westNeighbour.x] == distance[nextPosition->y][nextPosition->x] - 1){
                         int west = FromTwoDToOneD((int)westNeighbour.x, (int)westNeighbour.y, maxSize.y);
@@ -369,38 +417,54 @@ int main()
                         stack->Push(&westNeighbour);
                         *nextPosition = westNeighbour;
                         test = stack->GetLast();
-                        printf("\n\n%i, %i\n\n", test->x, test->y);
-                        level[FromTwoDToOneD(test->x, test->y, maxSize.y)] = 2;
+                        printf("\n\n%i, %i\n\n", test->x, test->y);level[FromTwoDToOneD(test->x, test->y, maxSize.y)] = 2;
+
                         maze[test->y][test->x] = 120;
                         maze[test ->y + 1][test->x] = 120;
                         maze[test->y - 1][test->x] = 120;
                         maze[test ->y][test->x + 1] = 120;
                         maze[test->y][test->x - 1] = 120;
+
                         maze[test->y + 1][test->x + 1] = 120;
                         maze[test->y - 1][test->x - 1] = 120;
                         maze[test->y - 1][test->x + 1] = 120;
-                        maze[test->y - 1][test->x + 1] = 120;}}
+                        maze[test->y + 1][test->x - 1] = 120;
+
+                        /*
+                        water = FromTwoDToOneD(test->x + 1, test->y - 1, maxSize.y);
+                        level[water] = 1;
+                        water = FromTwoDToOneD(test->x - 1, test->y + 1, maxSize.y);
+                        level[water] = 1;*/
+
+                    }}
                 sf::Vector2i linePosition;
                 int linePositionInt;
                 // get position from the stack and add tree
-                while(true){linePositionInt = PopStack(staticStack);linePosition = FromOneDToTwoD(linePositionInt, maxSize.y);level[linePositionInt] = 2;if (staticStack->topOfStack == 0)break;}
-                maze[StartPosition.y][StartPosition.x] = 120;
-                maze[FinishPosition.y][FinishPosition.x] = 120;
-                isFinishSet = false;
-                isStartSet = false;
-                distance = allocateMemoryForMazeDistance(maxSize.y, maxSize.x);
-                visited = allocateMemoryForMazeVisited(maxSize.y, maxSize.x);}}
+                while(true)
+                {
+                    linePositionInt = PopStack(staticStack);linePosition = FromOneDToTwoD(linePositionInt, maxSize.y);level[linePositionInt] = 2;if (staticStack->topOfStack == 0)break;}
+                    maze[StartPosition.y][StartPosition.x] = 120;
+                    maze[FinishPosition.y][FinishPosition.x] = 120;
+                    isFinishSet = false;
+                    isStartSet = false;
+                    distance = allocateMemoryForMazeDistance(maxSize.y, maxSize.x);
+                    visited = allocateMemoryForMazeVisited(maxSize.y, maxSize.x);}
+        }
+
         if (!map.load("tiles.png", sf::Vector2u(32, 32), level, maxSize.y, maxSize.x))  // if ?
             return -1;      //  it returns -1
         window.clear();
         window.draw(map);
-        window.display();}
-    while (queue->size != 0)    // cleans up
-        Dequeue(queue);
+        window.display();
+    }
+
+    while (queue->size != 0)Dequeue(queue);
+
     infile.close(); // infile close
     deleteMemoryForMaze(maze, maxSize.y);   // delete something, not good?
     deleteMemoryForDistance(distance, maxSize.y);
     deleteMemoryForVisited(visited, maxSize.y);
+
     return 0;   // finished
 }
 
