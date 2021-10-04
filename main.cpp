@@ -252,7 +252,7 @@ int main()
                 distance = allocateMemoryForMazeDistance(maxSize.y, maxSize.x);
                 visited = allocateMemoryForMazeVisited(maxSize.y, maxSize.x);
 
-                maze[FinishPosition.y][FinishPosition.x] = 120;
+                /*maze[FinishPosition.y][FinishPosition.x] = 120;
 
                 maze[StartPosition.y + 1][StartPosition.x] = 120;
                 maze[StartPosition.y - 1][StartPosition.x] = 120;
@@ -272,9 +272,9 @@ int main()
                 maze[FinishPosition.y + 1][FinishPosition.x + 1] = 120;
                 maze[FinishPosition.y - 1][FinishPosition.x - 1] = 120;
                 maze[FinishPosition.y + 1][FinishPosition.x - 1] = 120;
-                maze[FinishPosition.y - 1][FinishPosition.x + 1] = 120;
+                maze[FinishPosition.y - 1][FinishPosition.x + 1] = 120;*/
 
-            }else{
+            } else {
                 // slightly confused, but somehow works
                 while (queue->size != 0)Dequeue(queue);
                 int water;
