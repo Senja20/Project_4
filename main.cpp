@@ -1,5 +1,6 @@
 #include <cstdio>
 #include <SFML/Graphics.hpp>
+#include <SFML/Window.hpp>
 #include <iostream>
 #include "TileMap.h"
 #include "Queue.h"
@@ -33,7 +34,7 @@ int main()
 
     Queue queue = CreateQueue(maxSize.x * 2 + maxSize.y * 2);
 
-// create the window
+    // create the window
     sf::RenderWindow window(sf::VideoMode(maxSize.y*tileSize + 2 , maxSize.x*tileSize + 2), "Project 4");
     sf::View view;
     char **maze = allocateMemoryForMaze(maxSize.y, maxSize.x);

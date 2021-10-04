@@ -82,11 +82,15 @@ bool** allocateMemoryForMazeVisited(int maxCol, int maxRow)
 void addMaze(char** memory, std::vector<sf::Vector2i> barrier)
 {
     sf::Vector2i barrierTile;
+    sf::Vector2i maxSize;
+
+    maxSize = barrier[0];
 
     for (int i = 1; i < barrier.size(); ++i)
     {
         barrierTile = barrier[i];
-        memory[barrierTile.y][barrierTile.x] = 120;
+        if(barrierTile.x < maxSize.x && barrierTile.y < maxSize.y && barrierTile.x > 0 && barrierTile.y > 0)
+            memory[barrierTile.y][barrierTile.x] = 120;
     }
 }
 
